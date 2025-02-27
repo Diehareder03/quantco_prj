@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  postgres_db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+
+  airflow:
+    image: apache/airflow:2.7.3
+    restart: always
+    depends_on:
+      - postgres_db
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres_db:5432/airflow
+      - AIRFLOW__WEBSERVER__SECRET_KEY=your_secret_key_here  # Change this to a random secret key
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags  # Ensure this path points to where your DAGs are located
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "airflow db upgrade && airflow users create --username airflow --firstname airflow --lastname airflow --role Admin --email airflow@gmail.com --password airflow && airflow webserver"
