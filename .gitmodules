@@ -1,0 +1,3 @@
+[submodule "weather_pipeline"]
+	path = weather_pipeline
+	url = https://github.com/Diehareder03/quantco_prj.git
